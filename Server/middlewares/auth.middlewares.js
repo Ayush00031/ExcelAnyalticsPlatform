@@ -1,15 +1,24 @@
 import { verify } from "jsonwebtoken";
 
-export function verifyToken(req, res, next) {
-  const token = req.headers.aurhorization?.split(" ")[1];
-  if (!token) {
-    return res.status(401).json("A token is required for authentication");
+export default function verifyToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  console.log("🚀 Received Authorization header:", authHeader);
+
+  if (!authHeader) {
+    return res.status(401).json({ msg: "No token provided" });
   }
+
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.slice(7).trim()
+    : authHeader;
+
   try {
     const decoded = verify(token, process.env.JWT_SECRET);
+    console.log("Decoded JWT:", decoded);
     req.user = decoded;
     next();
-  } catch {
-    return res.status(403).json({ message: "Invalid Token" });
+  } catch (err) {
+    console.error("JWT Verification Failed:", err.message);
+    return res.status(401).json({ msg: "Invalid token" });
   }
 }

@@ -3,10 +3,15 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
 
 export const register = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body;
   try {
     const hashPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashPassword }); // ✅ FIXED
+    const user = new User({
+      username,
+      email,
+      password: hashPassword,
+      role: role || "user",
+    }); // ✅ FIXED
     await user.save();
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
@@ -44,6 +49,17 @@ export const login = async (req, res) => {
         role: user.role,
       },
     });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    res.json(user);
   } catch (err) {
     res
       .status(500)
