@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs"; // Also fix typo: was "bycrypt"
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
 
@@ -11,7 +11,7 @@ export const register = async (req, res) => {
       email,
       password: hashPassword,
       role: role || "user",
-    }); // ✅ FIXED
+    });
     await user.save();
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
