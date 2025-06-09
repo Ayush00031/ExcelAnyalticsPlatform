@@ -1,6 +1,6 @@
 import { verify } from "jsonwebtoken";
 
-export default function verifyToken(req, res, next) {
+export default function auth(req, res, next) {
   const authHeader = req.headers["authorization"];
   console.log("🚀 Received Authorization header:", authHeader);
 
