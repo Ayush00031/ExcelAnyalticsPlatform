@@ -1,6 +1,7 @@
-import { verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export default function auth(req, res, next) {
+  console.log("🧪 All Headers Received:", req.headers);
   const authHeader = req.headers["authorization"];
   console.log("🚀 Received Authorization header:", authHeader);
 
@@ -13,7 +14,7 @@ export default function auth(req, res, next) {
     : authHeader;
 
   try {
-    const decoded = verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("Decoded JWT:", decoded);
     req.user = decoded;
     next();

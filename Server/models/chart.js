@@ -1,12 +1,13 @@
-import { Schema } from "mongoose";
-const chartSchema = new Schema({
+import mongoose from "mongoose";
+
+const chartSchema = new mongoose.Schema({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  filedId: {
-    type: Schema.Types.ObjectId,
+  fileId: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: "FileUpload",
     required: true,
   },
@@ -28,7 +29,7 @@ const chartSchema = new Schema({
     required: true,
   },
   chartData: {
-    type: Schema.Types.Mixed, // Can store any type of data
+    type: mongoose.Schema.Types.Mixed,
     required: true,
   },
   createdDate: {
@@ -36,6 +37,7 @@ const chartSchema = new Schema({
     default: Date.now,
   },
 });
+
 const Chart = mongoose.model("Chart", chartSchema);
 
 export default Chart;

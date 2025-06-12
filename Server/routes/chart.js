@@ -6,7 +6,7 @@ import {
   createChart,
   getUserCharts,
   getChart,
-} from "../controllers/chart.controller.js";
+} from "../controllers/chartController.js";
 
 const router = Router();
 
