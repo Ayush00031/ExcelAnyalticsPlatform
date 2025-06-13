@@ -1,7 +1,14 @@
-import React from "react";
+import { Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import Register from "./pages/Register";
 
-const App = () => {
-  return <div className="text-3xl font-bold">App</div>;
-};
+function App() {
+  return (
+    <Routes>
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<LoginPage />} />
+    </Routes>
+  );
+}
 
 export default App;
