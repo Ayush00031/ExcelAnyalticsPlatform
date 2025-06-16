@@ -2,25 +2,45 @@ import React, { useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
-import excelAnimation from "../assets/excel.json"; // Update with your Lottie JSON file
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import excelAnimation from "../assets/excel.json";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     role: "user",
   });
 
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError(""); // Clear error when typing
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login Data:", formData);
-    // Redirect or call login API here
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData
+      );
+
+      // Store token or user data as needed
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // Navigate to dashboard or role-based route
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.msg || "Login failed. Please try again.");
+    }
   };
 
   return (
@@ -35,7 +55,7 @@ const LoginPage = () => {
         <div className="w-full md:w-1/2 p-6 bg-emerald-50 flex items-center justify-center">
           <Lottie
             animationData={excelAnimation}
-            loop={true}
+            loop
             className="max-h-96 w-full"
           />
         </div>
@@ -60,6 +80,8 @@ const LoginPage = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="off"
+                placeholder="Enter your email"
                 className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
               />
             </div>
@@ -78,6 +100,7 @@ const LoginPage = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
+                placeholder="Enter your password"
                 className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
               />
             </div>
@@ -100,6 +123,8 @@ const LoginPage = () => {
                 <option value="admin">Admin</option>
               </select>
             </div>
+
+            {error && <p className="text-sm text-red-600 -mt-2">{error}</p>}
 
             <button
               type="submit"

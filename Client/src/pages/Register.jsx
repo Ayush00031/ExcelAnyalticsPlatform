@@ -2,14 +2,15 @@ import React, { useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
-import excelAnimation from "../assets/excel.json"; // Replace with your Lottie file
+import excelAnimation from "../assets/excel.json";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -17,6 +18,7 @@ const Register = () => {
   });
 
   const [passwordError, setPasswordError] = useState("");
+  const [serverError, setServerError] = useState("");
 
   const validatePassword = (password) => {
     const hasUpperCase = /[A-Z]/.test(password);
@@ -31,7 +33,7 @@ const Register = () => {
 
   const isFormValid = () => {
     return (
-      formData.name &&
+      formData.username &&
       formData.email &&
       !validatePassword(formData.password) &&
       formData.password === formData.confirmPassword
@@ -46,11 +48,27 @@ const Register = () => {
     if (name === "password") {
       setPasswordError(validatePassword(value));
     }
+
+    setServerError(""); // Clear server error on change
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        formData
+      );
+      alert(res.data.message || "Registered successfully!");
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+      setServerError(
+        err.response?.data?.error ||
+          err.response?.data?.message ||
+          "Registration failed."
+      );
+    }
   };
 
   const renderInput = (id, label, type = "text") => (
@@ -65,16 +83,18 @@ const Register = () => {
         type={type}
         name={id}
         id={id}
+        autoComplete="off"
+        placeholder={label}
         required
         value={formData[id]}
         onChange={handleChange}
-        className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
+        className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 placeholder-gray-400"
       />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-emerald-100 via-emerald-200 to-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-emerald-50 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -85,7 +105,7 @@ const Register = () => {
         <div className="w-full md:w-1/2 p-6 bg-emerald-50 flex items-center justify-center">
           <Lottie
             animationData={excelAnimation}
-            loop={true}
+            loop
             className="max-h-96 w-full"
           />
         </div>
@@ -96,7 +116,7 @@ const Register = () => {
             Create Your Account
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {renderInput("name", "Full Name")}
+            {renderInput("username", "Username")}
             {renderInput("email", "Email", "email")}
             {renderInput("password", "Password", "password")}
 
@@ -131,6 +151,10 @@ const Register = () => {
                 <option value="admin">Admin</option>
               </select>
             </div>
+
+            {serverError && (
+              <p className="text-sm text-red-600 -mt-2">{serverError}</p>
+            )}
 
             <button
               type="submit"

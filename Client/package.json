@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "@tailwindcss/vite": "^4.1.8",
+    "axios": "^1.10.0",
     "client": "file:",
     "framer-motion": "^12.18.1",
     "lottie-react": "^2.4.1",

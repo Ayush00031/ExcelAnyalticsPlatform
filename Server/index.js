@@ -8,6 +8,7 @@ dotenv.config();
 //Middleware
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 // Route imports
 import auth from "./routes/auth.routes.js";
@@ -20,8 +21,6 @@ app.use("/api/files", fileRoutes);
 app.use("/api/auth", auth);
 app.use("/api/charts", chartRoutes);
 app.use("/api/admin", adminRoutes);
-
-app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
