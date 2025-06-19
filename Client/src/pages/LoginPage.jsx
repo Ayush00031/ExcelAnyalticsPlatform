@@ -1,144 +1,104 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import excelAnimation from "../assets/excel.json";
+import loginAnimation from "../assets/excel.json";
+import { useDispatch, useSelector } from "react-redux";
+import { clearError, loginUser } from "../redux/slices/authSlice";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error, isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
 
-  const [formData, setFormData] = useState({
+  const [credentials, setCredentials] = useState({
     email: "",
     password: "",
-    role: "user",
   });
 
-  const [error, setError] = useState("");
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError(""); // Clear error when typing
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
+
+    if (error) dispatch(clearError());
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData
-      );
-
-      // Store token or user data as needed
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
-      // Navigate to dashboard or role-based route
-      navigate("/dashboard");
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.msg || "Login failed. Please try again.");
-    }
+    dispatch(loginUser(credentials));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-emerald-100 via-emerald-200 to-white flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-100 via-white to-emerald-50 px-4">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-5xl flex flex-col md:flex-row items-center bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200"
+        className="w-full max-w-5xl flex flex-col md:flex-row items-center bg-white rounded-3xl shadow-2xl overflow-hidden border"
       >
-        {/* Animation */}
-        <div className="w-full md:w-1/2 p-6 bg-emerald-50 flex items-center justify-center">
+        <div className="w-full md:w-1/2 p-6 bg-emerald-50 flex justify-center">
           <Lottie
-            animationData={excelAnimation}
+            animationData={loginAnimation}
             loop
             className="max-h-96 w-full"
           />
         </div>
 
-        {/* Login Form */}
         <div className="w-full md:w-1/2 p-8 md:p-10 bg-white">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+          <h2 className="text-3xl font-bold mb-6 text-center">
             Login to Your Account
           </h2>
+
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                autoComplete="off"
-                placeholder="Enter your email"
-                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
-              />
-            </div>
+            {["email", "password"].map((field) => (
+              <div key={field} className="w-full">
+                <label
+                  htmlFor={field}
+                  className="block text-sm mb-1 capitalize"
+                >
+                  {field}
+                </label>
+                <input
+                  type={field === "password" ? "password" : "email"}
+                  name={field}
+                  id={field}
+                  value={credentials[field]}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+            ))}
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="role"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
-                Role
-              </label>
-              <select
-                name="role"
-                id="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-
-            {error && <p className="text-sm text-red-600 -mt-2">{error}</p>}
+            {error && <p className="text-sm text-red-600">{error}</p>}
 
             <button
               type="submit"
-              className="w-full py-3 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition"
+              disabled={loading}
+              className={`w-full py-3 rounded-lg text-white font-semibold ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-emerald-500 hover:bg-emerald-600"
+              }`}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-gray-600">
-            Don’t have an account?{" "}
+          <p className="mt-4 text-center text-sm">
+            Don't have an account?{" "}
             <button
               onClick={() => navigate("/register")}
-              className="text-emerald-600 font-medium hover:underline"
+              className="text-emerald-600 hover:underline"
             >
               Register
             </button>

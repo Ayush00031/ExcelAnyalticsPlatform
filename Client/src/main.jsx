@@ -1,15 +1,17 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom"; // ✅ import this
+import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux"; // ✅ Import Provider
 import "./index.css";
 import App from "./App.jsx";
+import { store } from "./redux/store.js";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      {" "}
-      {/* ✅ wrap App in BrowserRouter */}
-      <App />
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>
   </StrictMode>
 );
