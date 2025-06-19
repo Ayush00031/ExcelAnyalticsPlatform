@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 //upload excel file
-router.post("/upload", upload.single("excel"), uploadExcelFile);
+router.post("/upload", auth, upload.single("excel"), uploadExcelFile);
 
 // Get user's uploaded files
 router.get("/", auth, getUserFiles);
