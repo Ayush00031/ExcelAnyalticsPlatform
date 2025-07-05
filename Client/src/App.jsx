@@ -3,6 +3,8 @@ import LoginPage from "./pages/LoginPage";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import UploadFile from "./pages/UploadFile";
+import ChartPage from "./pages/ChartPage";
+import HistoryPage from "./pages/HistoryPage";
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/upload" element={<UploadFile />} />
+      <Route path="/charts" element={<ChartPage />} />
+      <Route path="/history" element={<HistoryPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
   );
