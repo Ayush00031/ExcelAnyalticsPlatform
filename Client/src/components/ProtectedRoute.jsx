@@ -1,0 +1,18 @@
+// src/components/ProtectedRoute.jsx
+import React from "react";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+
+const ProtectedRoute = ({ children }) => {
+  const user = useSelector((state) => state.auth.user);
+  const token =
+    useSelector((state) => state.auth.token) || localStorage.getItem("token");
+
+  if (!user || !token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+export default ProtectedRoute;

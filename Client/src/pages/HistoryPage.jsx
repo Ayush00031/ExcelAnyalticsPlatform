@@ -7,7 +7,7 @@ import { format } from "date-fns";
 
 const HistoryPage = () => {
   const dispatch = useDispatch();
-  const { files, loading, error } = useSelector((state) => state.files);
+  const { userFiles, loading, error } = useSelector((state) => state.files);
 
   useEffect(() => {
     dispatch(getUserFiles());
@@ -27,13 +27,13 @@ const HistoryPage = () => {
           {loading && <p>Loading...</p>}
           {error && <p className="text-red-500">{error}</p>}
 
-          {!loading && files.length === 0 && (
+          {!loading && userFiles.length === 0 && (
             <p className="text-gray-600">No uploaded files yet.</p>
           )}
 
-          {!loading && files.length > 0 && (
+          {!loading && userFiles.length > 0 && (
             <div className="space-y-4">
-              {files.map((file) => (
+              {userFiles.map((file) => (
                 <div
                   key={file._id}
                   className="bg-white p-4 rounded-lg shadow border-l-4 border-emerald-500"

@@ -117,4 +117,31 @@ const getFileData = async (req, res) => {
   }
 };
 
-export { upload, uploadExcelFile, getUserFiles, getFileData };
+const getRecentActivity = async (req, res) => {
+  try {
+    const recentFiles = await FileUpload.find({ userId: req.user._id })
+      .sort({ uploadDate: -1 })
+      .limit(5)
+      .select("originalFileName uploadDate");
+
+    const activity = recentFiles.map((file) => {
+      const date = new Date(file.uploadDate).toLocaleString();
+      return `📄 Uploaded "${file.originalFileName}" on ${date}`;
+    });
+
+    res.status(200).json(activity);
+  } catch (error) {
+    console.error("Error fetching recent activity:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to load activity", error: error.message });
+  }
+};
+
+export {
+  upload,
+  uploadExcelFile,
+  getUserFiles,
+  getFileData,
+  getRecentActivity,
+};

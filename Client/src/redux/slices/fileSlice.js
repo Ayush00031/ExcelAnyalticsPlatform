@@ -24,7 +24,7 @@ export const uploadExcelFile = createAsyncThunk(
   }
 );
 
-// Get uploaded files for logged-in user
+// Get all files uploaded by current user
 export const getUserFiles = createAsyncThunk(
   "files/getUserFiles",
   async (_, { rejectWithValue }) => {
@@ -44,18 +44,46 @@ export const getUserFiles = createAsyncThunk(
   }
 );
 
+// Get specific file data by file ID
+export const getFileDataById = createAsyncThunk(
+  "files/getFileDataById",
+  async (fileId, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`http://localhost:5000/api/files/${fileId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch file data"
+      );
+    }
+  }
+);
+
 const fileSlice = createSlice({
   name: "files",
   initialState: {
     loading: false,
     error: null,
     success: false,
-    files: [],
+    userFiles: [],
+    selectedFileData: null,
   },
-  reducers: {},
+  reducers: {
+    clearSuccess: (state) => {
+      state.success = false;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      // Upload file
+      // Upload
       .addCase(uploadExcelFile.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -70,20 +98,37 @@ const fileSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Fetch user's uploaded files
+      // Get User Files
       .addCase(getUserFiles.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(getUserFiles.fulfilled, (state, action) => {
         state.loading = false;
-        state.files = action.payload;
+        state.userFiles = action.payload;
       })
       .addCase(getUserFiles.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Get Selected File Data
+      .addCase(getFileDataById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.selectedFileData = null;
+      })
+      .addCase(getFileDataById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedFileData = action.payload;
+      })
+      .addCase(getFileDataById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.selectedFileData = null;
       });
   },
 });
 
+export const { clearSuccess, clearError } = fileSlice.actions;
 export default fileSlice.reducer;

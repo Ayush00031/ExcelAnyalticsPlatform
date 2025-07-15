@@ -8,9 +8,17 @@ const RecentActivity = () => {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
+        const token = localStorage.getItem("token");
+
         const res = await axios.get(
-          "http://localhost:5000/api/files/recent-activity"
+          "http://localhost:5000/api/files/recent-activity",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
+
         setActivities(res.data);
       } catch (error) {
         console.error("Failed to load recent activity:", error.message);
