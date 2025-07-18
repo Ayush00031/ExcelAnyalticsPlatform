@@ -13,7 +13,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="fixed top-23 left-0 h-[calc(90vh-4rem)] w-64 bg-gradient-to-r from-emerald-300 to-emerald-500 text-white shadow-md rounded-tr-3xl rounded-br-3xl z-40 transition-all duration-300 ease-in-out">
+    <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-gradient-to-r from-emerald-300 to-emerald-500 text-white shadow-md z-40 transition-all duration-300 ease-in-out overflow-y-auto">
       <nav className="flex flex-col gap-4 p-6">
         {links.map(({ path, label }) => {
           const isActive = location.pathname === path;
